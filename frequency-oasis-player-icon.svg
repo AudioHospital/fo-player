@@ -1,0 +1,79 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg" cx="50%" cy="50%" r="50%">
+      <stop offset="0%" stop-color="#1a1710"/>
+      <stop offset="100%" stop-color="#080808"/>
+    </radialGradient>
+    <linearGradient id="gold" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#e8c96a"/>
+      <stop offset="50%" stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#8a6a20"/>
+    </linearGradient>
+    <linearGradient id="gold2" x1="0%" y1="0%" x2="0%" y2="100%">
+      <stop offset="0%" stop-color="#c9a84c"/>
+      <stop offset="100%" stop-color="#6a4e18"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bg)"/>
+
+  <!-- Outer ring -->
+  <circle cx="256" cy="256" r="240" fill="none" stroke="#c9a84c" stroke-width="2" opacity="0.4"/>
+  <circle cx="256" cy="256" r="228" fill="none" stroke="#c9a84c" stroke-width="0.5" opacity="0.2"/>
+
+  <!-- Corner brackets -->
+  <g stroke="#c9a84c" stroke-width="3" fill="none" opacity="0.7">
+    <path d="M 120 120 L 120 148 M 120 120 L 148 120"/>
+    <path d="M 392 120 L 392 148 M 392 120 L 364 120"/>
+    <path d="M 120 392 L 120 364 M 120 392 L 148 392"/>
+    <path d="M 392 392 L 392 364 M 392 392 L 364 392"/>
+  </g>
+
+  <!-- Waveform bars (background) -->
+  <g fill="#c9a84c" opacity="0.15">
+    <rect x="80" y="220" width="8" height="72" rx="2"/>
+    <rect x="96" y="200" width="8" height="112" rx="2"/>
+    <rect x="112" y="215" width="8" height="82" rx="2"/>
+    <rect x="400" y="220" width="8" height="72" rx="2"/>
+    <rect x="416" y="200" width="8" height="112" rx="2"/>
+    <rect x="432" y="215" width="8" height="82" rx="2"/>
+  </g>
+
+  <!-- Play button hexagon shape -->
+  <polygon points="256,140 356,198 356,314 256,372 156,314 156,198" fill="none" stroke="url(#gold)" stroke-width="2.5" opacity="0.6"/>
+
+  <!-- Inner circle -->
+  <circle cx="256" cy="256" r="88" fill="#0d0c08" stroke="url(#gold)" stroke-width="2"/>
+
+  <!-- Play triangle -->
+  <polygon points="238,220 238,292 308,256" fill="url(#gold)"/>
+
+  <!-- Small waveform lines below play -->
+  <g fill="url(#gold2)" opacity="0.8">
+    <rect x="186" y="310" width="6" height="18" rx="1"/>
+    <rect x="198" y="304" width="6" height="30" rx="1"/>
+    <rect x="210" y="298" width="6" height="22" rx="1"/>
+    <rect x="222" y="308" width="6" height="14" rx="1"/>
+    <rect x="234" y="300" width="6" height="28" rx="1"/>
+    <rect x="246" y="294" width="6" height="34" rx="1"/>
+    <rect x="258" y="302" width="6" height="24" rx="1"/>
+    <rect x="270" y="306" width="6" height="16" rx="1"/>
+    <rect x="282" y="298" width="6" height="26" rx="1"/>
+    <rect x="294" y="304" width="6" height="20" rx="1"/>
+    <rect x="306" y="310" width="6" height="14" rx="1"/>
+    <rect x="318" y="300" width="6" height="28" rx="1"/>
+  </g>
+
+  <!-- FO text -->
+  <text x="256" y="192" font-family="Georgia, serif" font-size="22" font-weight="bold" fill="#c9a84c" text-anchor="middle" letter-spacing="8" opacity="0.9">FO</text>
+
+  <!-- Bottom label -->
+  <text x="256" y="430" font-family="monospace" font-size="18" fill="#c9a84c" text-anchor="middle" letter-spacing="6" opacity="0.7">PLAYER</text>
+
+  <!-- Dot accents -->
+  <circle cx="256" cy="158" r="3" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="256" cy="354" r="3" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="158" cy="256" r="3" fill="#c9a84c" opacity="0.5"/>
+  <circle cx="354" cy="256" r="3" fill="#c9a84c" opacity="0.5"/>
+</svg>
