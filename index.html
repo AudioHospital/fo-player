@@ -4,6 +4,23 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Frequency Oasis — Player</title>
+<meta name="description" content="Frequency Oasis local video player by Smokey Eye Beats">
+<meta name="theme-color" content="#c9a84c">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="FO Player">
+<link rel="manifest" href="data:application/json,{
+  %22name%22:%22Frequency%20Oasis%20Player%22,
+  %22short_name%22:%22FO%20Player%22,
+  %22description%22:%22Local%20video%20player%20by%20Frequency%20Oasis%22,
+  %22start_url%22:%22/%22,
+  %22display%22:%22standalone%22,
+  %22background_color%22:%22%23080808%22,
+  %22theme_color%22:%22%23c9a84c%22,
+  %22orientation%22:%22landscape-primary%22,
+  %22icons%22:[{%22src%22:%22data:image/svg+xml,%3Csvg%20xmlns%3D'http%3A//www.w3.org/2000/svg'%20viewBox%3D'0%200%20512%20512'%3E%3Ccircle%20cx%3D'256'%20cy%3D'256'%20r%3D'256'%20fill%3D'%23080808'/%3E%3Ccircle%20cx%3D'256'%20cy%3D'256'%20r%3D'240'%20fill%3D'none'%20stroke%3D'%23c9a84c'%20stroke-width%3D'3'/%3E%3Ccircle%20cx%3D'256'%20cy%3D'256'%20r%3D'88'%20fill%3D'%230d0c08'%20stroke%3D'%23c9a84c'%20stroke-width%3D'2'/%3E%3Cpolygon%20points%3D'238%2C220%20238%2C292%20308%2C256'%20fill%3D'%23c9a84c'/%3E%3Ctext%20x%3D'256'%20y%3D'192'%20font-family%3D'Georgia%2Cserif'%20font-size%3D'22'%20fill%3D'%23c9a84c'%20text-anchor%3D'middle'%20letter-spacing%3D'8'%3EFO%3C/text%3E%3Ctext%20x%3D'256'%20y%3D'430'%20font-family%3D'monospace'%20font-size%3D'18'%20fill%3D'%23c9a84c'%20text-anchor%3D'middle'%20letter-spacing%3D'6'%3EPLAYER%3C/text%3E%3C/svg%3E%22,%22sizes%22:%22512x512%22,%22type%22:%22image/svg+xml%22,%22purpose%22:%22any%20maskable%22}]
+}">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -815,6 +832,62 @@
     e.preventDefault();
     addFiles(e.dataTransfer.files);
   });
+</script>
+
+<script>
+  // PWA Install prompt
+  let deferredPrompt;
+  const installBtn = document.createElement('button');
+  installBtn.className = 'btn';
+  installBtn.textContent = '⬇ Install App';
+  installBtn.style.display = 'none';
+  installBtn.style.position = 'fixed';
+  installBtn.style.bottom = '16px';
+  installBtn.style.right = '16px';
+  installBtn.style.zIndex = '1000';
+  installBtn.style.background = '#c9a84c';
+  installBtn.style.color = '#080808';
+  installBtn.style.border = 'none';
+  installBtn.style.padding = '10px 18px';
+  installBtn.style.fontFamily = 'Space Mono, monospace';
+  installBtn.style.fontSize = '0.75rem';
+  installBtn.style.letterSpacing = '0.1em';
+  installBtn.style.cursor = 'pointer';
+  document.body.appendChild(installBtn);
+
+  window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'block';
+  });
+
+  installBtn.addEventListener('click', async () => {
+    if (!deferredPrompt) return;
+    deferredPrompt.prompt();
+    const { outcome } = await deferredPrompt.userChoice;
+    if (outcome === 'accepted') installBtn.style.display = 'none';
+    deferredPrompt = null;
+  });
+
+  window.addEventListener('appinstalled', () => {
+    installBtn.style.display = 'none';
+  });
+
+  // Register service worker via blob
+  if ('serviceWorker' in navigator) {
+    const swCode = `
+      const CACHE = 'fo-player-v1';
+      self.addEventListener('install', e => {
+        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+      });
+      self.addEventListener('fetch', e => {
+        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+      });
+    `;
+    const blob = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl = URL.createObjectURL(blob);
+    navigator.serviceWorker.register(swUrl, { scope: '/' }).catch(() => {});
+  }
 </script>
 </body>
 </html>
