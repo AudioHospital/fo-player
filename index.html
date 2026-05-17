@@ -10,9 +10,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="FO Player">
-<link rel="manifest" href="/manifest.json">
-<link rel="apple-touch-icon" href="/frequency-oasis-player-icon.svg">
-  
+
+<!-- Inline SVG icon as data URI for apple-touch-icon -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Crect width='512' height='512' fill='%23080808'/%3E%3Ccircle cx='256' cy='256' r='220' fill='none' stroke='%23c9a84c' stroke-width='18'/%3E%3Ccircle cx='256' cy='256' r='140' fill='none' stroke='%23c9a84c' stroke-width='8' stroke-dasharray='20 10'/%3E%3Ccircle cx='256' cy='256' r='60' fill='%23c9a84c'/%3E%3Ccircle cx='256' cy='256' r='28' fill='%23080808'/%3E%3Cline x1='256' y1='36' x2='256' y2='116' stroke='%23c9a84c' stroke-width='12' stroke-linecap='round'/%3E%3Cline x1='256' y1='396' x2='256' y2='476' stroke='%23c9a84c' stroke-width='12' stroke-linecap='round'/%3E%3Cline x1='36' y1='256' x2='116' y2='256' stroke='%23c9a84c' stroke-width='12' stroke-linecap='round'/%3E%3Cline x1='396' y1='256' x2='476' y2='256' stroke='%23c9a84c' stroke-width='12' stroke-linecap='round'/%3E%3C/svg%3E">
+
+<!-- Inline manifest via blob — injected by JS below -->
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
@@ -589,6 +591,55 @@
 <input type="file" id="fileInput" multiple accept="video/*" style="display:none">
 
 <script>
+  // ─── INLINE MANIFEST + ICON ──────────────────────────────────────────────
+  // Icon SVG — gold frequency ring on black
+  const ICON_SVG = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+    <rect width="512" height="512" rx="80" fill="#080808"/>
+    <circle cx="256" cy="256" r="210" fill="none" stroke="#c9a84c" stroke-width="18"/>
+    <circle cx="256" cy="256" r="150" fill="none" stroke="#c9a84c" stroke-width="8" stroke-dasharray="22 12"/>
+    <circle cx="256" cy="256" r="90" fill="none" stroke="#7a5f24" stroke-width="4"/>
+    <circle cx="256" cy="256" r="56" fill="#c9a84c"/>
+    <circle cx="256" cy="256" r="24" fill="#080808"/>
+    <line x1="256" y1="46" x2="256" y2="106" stroke="#c9a84c" stroke-width="14" stroke-linecap="round"/>
+    <line x1="256" y1="406" x2="256" y2="466" stroke="#c9a84c" stroke-width="14" stroke-linecap="round"/>
+    <line x1="46" y1="256" x2="106" y2="256" stroke="#c9a84c" stroke-width="14" stroke-linecap="round"/>
+    <line x1="406" y1="256" x2="466" y2="256" stroke="#c9a84c" stroke-width="14" stroke-linecap="round"/>
+    <text x="256" y="490" text-anchor="middle" font-family="monospace" font-size="38" fill="#7a5f24" letter-spacing="4">FO</text>
+  </svg>`;
+
+  // Convert SVG to data URL for manifest icons
+  const iconDataUrl = 'data:image/svg+xml,' + encodeURIComponent(ICON_SVG);
+  const iconBase64  = 'data:image/svg+xml;base64,' + btoa(ICON_SVG);
+
+  // Build manifest JSON inline
+  const manifest = {
+    name: "Frequency Oasis Player",
+    short_name: "FO Player",
+    description: "Local video player by Smokey Eye Beats",
+    start_url: ".",
+    display: "standalone",
+    background_color: "#080808",
+    theme_color: "#c9a84c",
+    orientation: "any",
+    icons: [
+      { src: iconDataUrl, sizes: "any", type: "image/svg+xml", purpose: "any maskable" },
+      { src: iconBase64,  sizes: "512x512", type: "image/svg+xml" }
+    ]
+  };
+
+  // Inject manifest link tag dynamically
+  const manifestBlob = new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' });
+  const manifestUrl  = URL.createObjectURL(manifestBlob);
+  const manifestLink = document.createElement('link');
+  manifestLink.rel   = 'manifest';
+  manifestLink.href  = manifestUrl;
+  document.head.appendChild(manifestLink);
+
+  // Also update apple-touch-icon to use the base64 version (better iOS support)
+  const appleLink = document.querySelector('link[rel="apple-touch-icon"]');
+  if (appleLink) appleLink.href = iconBase64;
+
+  // ─── PLAYER LOGIC ────────────────────────────────────────────────────────
   const vid = document.getElementById('vid');
   const dropOverlay = document.getElementById('dropOverlay');
   const videoWrapper = document.getElementById('videoWrapper');
@@ -824,27 +875,18 @@
     e.preventDefault();
     addFiles(e.dataTransfer.files);
   });
-</script>
 
-<script>
-  // PWA Install prompt
+  // ─── PWA INSTALL PROMPT ──────────────────────────────────────────────────
   let deferredPrompt;
   const installBtn = document.createElement('button');
   installBtn.className = 'btn';
   installBtn.textContent = '⬇ Install App';
-  installBtn.style.display = 'none';
-  installBtn.style.position = 'fixed';
-  installBtn.style.bottom = '16px';
-  installBtn.style.right = '16px';
-  installBtn.style.zIndex = '1000';
-  installBtn.style.background = '#c9a84c';
-  installBtn.style.color = '#080808';
-  installBtn.style.border = 'none';
-  installBtn.style.padding = '10px 18px';
-  installBtn.style.fontFamily = 'Space Mono, monospace';
-  installBtn.style.fontSize = '0.75rem';
-  installBtn.style.letterSpacing = '0.1em';
-  installBtn.style.cursor = 'pointer';
+  installBtn.style.cssText = [
+    'display:none','position:fixed','bottom:16px','right:16px','z-index:1000',
+    'background:#c9a84c','color:#080808','border:none','padding:10px 18px',
+    'font-family:Space Mono,monospace','font-size:0.75rem',
+    'letter-spacing:0.1em','cursor:pointer'
+  ].join(';');
   document.body.appendChild(installBtn);
 
   window.addEventListener('beforeinstallprompt', (e) => {
@@ -865,19 +907,26 @@
     installBtn.style.display = 'none';
   });
 
-  // Register service worker via blob
+  // ─── SERVICE WORKER (blob) ───────────────────────────────────────────────
   if ('serviceWorker' in navigator) {
     const swCode = `
-      const CACHE = 'fo-player-v1';
+      const CACHE = 'fo-player-v2';
       self.addEventListener('install', e => {
-        e.waitUntil(caches.open(CACHE).then(c => c.addAll(['/'])));
+        self.skipWaiting();
+      });
+      self.addEventListener('activate', e => {
+        e.waitUntil(
+          caches.keys().then(keys =>
+            Promise.all(keys.filter(k => k !== 'fo-player-v2').map(k => caches.delete(k)))
+          )
+        );
       });
       self.addEventListener('fetch', e => {
-        e.respondWith(caches.match(e.request).then(r => r || fetch(e.request)));
+        e.respondWith(fetch(e.request).catch(() => caches.match(e.request)));
       });
     `;
-    const blob = new Blob([swCode], { type: 'application/javascript' });
-    const swUrl = URL.createObjectURL(blob);
+    const blob   = new Blob([swCode], { type: 'application/javascript' });
+    const swUrl  = URL.createObjectURL(blob);
     navigator.serviceWorker.register(swUrl, { scope: '/' }).catch(() => {});
   }
 </script>
